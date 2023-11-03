@@ -1,0 +1,12 @@
+FROM postgres:15-bullseye
+
+RUN apt-get update -y \
+  && apt-get install postgis -y \
+  && apt-get install postgresql-15-pgrouting -y \
+  && apt-get install postgresql-15-orafce -y \
+  && apt-get install postgresql-15-ogr-fdw -y \
+  && apt-get install postgresql-15-decoderbufs -y \
+  && apt-get install postgresql-15-wal2json -y \
+  && apt-get clean
+
+COPY --chown=postgres configuration/postgresql/postgresql.conf /tmp/postgresql.conf

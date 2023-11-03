@@ -1,0 +1,164 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    container_name: glue_pg_docker
+    hostname: glue_pg_docker
+    user: root
+    build:
+      context: .
+      dockerfile: pg-Dockerfile
+    ports:
+      - 15432:5432
+    env_file:
+      - pg.env
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./data/postgresql/data:/var/lib/postgresql/data"
+      - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+
+  activemq:
+    image: apache/activemq-artemis:latest
+    container_name: glue_activemq
+    hostname: glue_activemq
+    environment:
+      # - ACTIVEMQ_ACTIVEMQ_USERS_docker=docker
+      # - ACTIVEMQ_CONFIG_QUEUES_trash1=trash1
+      # - ACTIVEMQ_CONFIG_NAME=glue_activemq
+      # - ARTEMIS_USER=admin
+      # - ARTEMIS_PASSWORD=admin
+      - TZ=America/New_York
+    ports:
+      - 61616:61616
+      - 61613:61613
+      - 8161:8161
+      - 5672:5672
+      - 5445:5445
+      - 1883:1883
+    # expose:
+    #   - 61616
+    #   - 8161
+    volumes:
+      - "./data/activemq/data:/data/activemq"
+      - "./data/activemq/log:/var/log/activemq"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: glue_zookeeper
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+      - ALLOW_ANONYMOUS_LOGIN=true
+      - TZ=America/New_York
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: glue_broker
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - 50001:50001
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=glue_zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=EXTERNAL://localhost:50001,INTERNAL://glue_broker:50002
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - TZ=America/New_York
+  
+  schema-registry:    
+    container_name: glue_schema_registry
+    image: confluentinc/cp-schema-registry:latest
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      # - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=glue_zookeeper:2181
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://glue_broker:50002
+      - SCHEMA_REGISTRY_HOST_NAME=glue_schema_registry
+      # - SCHEMA_REGISTRY_HOST_PORT=8981
+      # - SCHEMA_REGISTRY_LISTENERS=http://glue_schema_registry:8981
+      - SCHEMA_REGISTRY_DEBUG=true
+    ports:
+        - 8981:8081
+  
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: glue_broker-ui
+    depends_on:
+      - zookeeper
+      - schema-registry
+      - kafka
+    ports:
+      - 9089:9000
+    environment:
+      - KAFKA_BROKERCONNECT=EXTERNAL://localhost:50001,INTERNAL://glue_broker:50002
+      - TZ=America/New_York
+
+  kafka_connect:
+    container_name: kafka_connect
+    image: debezium/connect:latest
+    restart: unless-stopped
+    ports:
+      - 8083:8083
+    links:
+      - zookeeper
+      - schema-registry
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=glue_broker:50002
+      - GROUP_ID=glue_debezium
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      - CONFIG_STORAGE_REPLICATION_FACTOR=1
+      - OFFSET_STORAGE_REPLICATION_FACTOR=1
+      - STATUS_STORAGE_REPLICATION_FACTOR=1
+      - REST_ADVERTISED_HOST_NAME=kafka_connect
+  
+  debezium_ui:
+    image: debezium/debezium-ui:latest
+    container_name: glue_debezium-ui
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+      - schema-registry
+      - kafka
+      - kafka_connect
+    ports:
+      - 8889:8080
+    environment:
+      - KAFKA_CONNECT_URIS=http://kafka_connect:8083
+      - TZ=America/New_York
+
+  glue_app:
+    container_name: glue_app
+    hostname: glue_app
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_URL=jdbc:postgresql://glue_pg_docker:5432/trash
+      - DATABASE_USER=docker
+      - DATABASE_PASSWORD=docker
+      - JMS_HOST=tcp://activemq:61616
+      - JMS_USER=artemis
+      - JMS_PASSWORD=artemis
+    depends_on:
+      - postgres
+      - activemq
+      - zookeeper
+      - schema-registry
+      - kafka
+      - kafdrop

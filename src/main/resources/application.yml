@@ -1,0 +1,31 @@
+spring:
+  docker:
+    compose:
+      enabled: "true"
+      file: docker-compose.yml
+  datasource:
+    url: "${DATABASE_URL}"
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+camel:
+  servlet:
+    mapping:
+      context-path: /rest/*
+  component:
+    log:
+      source-location-logger-name: true
+    jms:
+      allow-auto-wired-connection-factory: true
+    activemq:
+      broker-url: ${JMS_HOST}
+      username: ${JMS_USER}
+      password: ${JMS_PASSWORD}
+      autowired-enabled: true
+      test-connection-on-startup: true
+      enabled: true
