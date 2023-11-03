@@ -1,10 +1,8 @@
-# Project Title
-
-Glue
+# Glue
 
 ## Table of Contents
 
-- [Project Title](#project-title)
+- [Glue](#glue)
   - [Table of Contents](#table-of-contents)
   - [About ](#about-)
   - [Getting Started ](#getting-started-)
