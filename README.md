@@ -12,7 +12,7 @@
 
 ## About <a name = "about"></a>
 
-Experimentation using Docker, Spring Boot, Apache Camel, ActiveMQ (Artemis), Kafka, and PostgreSQL.
+Experimentation using Docker, Spring Boot, Apache Camel, ActiveMQ (Artemis), Kafka, DB2, and PostgreSQL.
 
 ## Getting Started <a name = "getting_started"></a>
 
