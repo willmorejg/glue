@@ -18,9 +18,14 @@ under the License.
 
 James G Willmore - LJ Computing - (C) 2023
 */
-package net.ljcomputing.glue.config;
+package net.ljcomputing.glue.repository.gluepg;
 
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
+import net.ljcomputing.glue.entity.Trash;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Configuration
-public class JpaConfig {}
+@Repository
+public interface PgTrashRepository extends JpaRepository<Trash, Long> {
+    List<Trash> findByValue(String value);
+}

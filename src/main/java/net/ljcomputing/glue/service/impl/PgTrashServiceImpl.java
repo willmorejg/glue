@@ -23,15 +23,19 @@ package net.ljcomputing.glue.service.impl;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import net.ljcomputing.glue.entity.Trash;
-import net.ljcomputing.glue.repository.TrashRepository;
+import net.ljcomputing.glue.repository.gluepg.PgTrashRepository;
 import net.ljcomputing.glue.service.TrashService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("trashService")
+@Service("pgTrashService")
 @Transactional
-public class TrashServiceImpl implements TrashService {
-    @Autowired TrashRepository trashRepository;
+public class PgTrashServiceImpl implements TrashService {
+    private final PgTrashRepository trashRepository;
+
+    public PgTrashServiceImpl(@Autowired final PgTrashRepository trashRepository) {
+        this.trashRepository = trashRepository;
+    }
 
     @Override
     public Trash save(final Trash entity) {

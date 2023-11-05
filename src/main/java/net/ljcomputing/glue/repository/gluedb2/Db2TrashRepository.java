@@ -18,7 +18,7 @@ under the License.
 
 James G Willmore - LJ Computing - (C) 2023
 */
-package net.ljcomputing.glue.repository;
+package net.ljcomputing.glue.repository.gluedb2;
 
 import java.util.List;
 import net.ljcomputing.glue.entity.Trash;
@@ -26,6 +26,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrashRepository extends JpaRepository<Trash, Long> {
+public interface Db2TrashRepository extends JpaRepository<Trash, Long> {
     List<Trash> findByValue(String value);
 }

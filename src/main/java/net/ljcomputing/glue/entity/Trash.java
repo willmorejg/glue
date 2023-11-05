@@ -32,7 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "trash")
+@Table(name = "trash", schema = "public")
 public class Trash {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

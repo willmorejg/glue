@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -35,11 +36,13 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(initializers = TestcontainersInitializer.class)
 @TestMethodOrder(OrderAnnotation.class)
 class GlueApplicationTests {
-    @Autowired TrashService trashService;
+    @Autowired
+    @Qualifier("pgTrashService")
+    TrashService pgTrashService;
 
     @Test
     @Order(1)
     void contextLoads() {
-        assertNotNull(trashService);
+        assertNotNull(pgTrashService);
     }
 }

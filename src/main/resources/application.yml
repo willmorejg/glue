@@ -4,19 +4,28 @@ spring:
       enabled: "true"
       file: docker-compose.yml
   datasource:
-    url: "${DATABASE_URL}"
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+    gluepg:
+      url: "${DATABASE_URL}"
+      username: ${DATABASE_USER}
+      password: ${DATABASE_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+    gluedb2:
+      url: "${DATABASE_URL_DB2}"
+      username: ${DATABASE_USER_DB2}
+      password: ${DATABASE_PASSWORD_DB2}
+      driver-class-name: com.ibm.db2.jcc.DB2Driver
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
 
 camel:
   servlet:
     mapping:
       context-path: /rest/*
+  dataformat:
+    jackson:
+      pretty-print: true
   component:
     log:
       source-location-logger-name: true

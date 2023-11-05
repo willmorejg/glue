@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -36,7 +37,9 @@ import org.springframework.test.context.ContextConfiguration;
 @TestMethodOrder(OrderAnnotation.class)
 class TrashServiceImplTest {
 
-    @Autowired private TrashService trashService;
+    @Autowired
+    @Qualifier("pgTrashService")
+    private TrashService pgTrashService;
 
     @Test
     @Order(1)
@@ -44,8 +47,8 @@ class TrashServiceImplTest {
         Trash trash = new Trash();
         trash.setValue("1");
         trash.setSubvalue("11");
-        trash = trashService.save(trash);
-        trashService.findByValue(trash.getValue());
-        trashService.delete(trash.getId());
+        trash = pgTrashService.save(trash);
+        pgTrashService.findByValue(trash.getValue());
+        pgTrashService.delete(trash.getId());
     }
 }

@@ -34,10 +34,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RestRoute extends RouteBuilder {
-    @Autowired private Environment env;
+    private final Environment env;
 
     @Value("${camel.servlet.mapping.context-path}")
     private String contextPath;
+
+    public RestRoute(@Autowired final Environment env) {
+        this.env = env;
+    }
 
     public void configure() throws Exception {
 
@@ -88,7 +92,7 @@ public class RestRoute extends RouteBuilder {
                 .message("All trash successfully returned")
                 .responseModel(List.class)
                 .endResponseMessage()
-                .to("bean:trashService?method=findAll")
+                .to("bean:pgTrashService?method=findAll")
 
                 // POST - create
                 .post()
@@ -122,11 +126,11 @@ public class RestRoute extends RouteBuilder {
                 .name("body")
                 .description("The trash to delete")
                 .endParam()
-                .to("bean:trashService?method=delete");
+                .to("bean:pgTrashService?method=delete");
 
         from("direct:saveTrash")
                 .multicast()
-                .to("bean:trashService?method=save", "direct:jmsTrash")
+                .to("bean:pgTrashService?method=save", "direct:jmsTrash")
                 .transform(simple("${body}"));
         from("direct:jmsTrash")
                 .marshal()

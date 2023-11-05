@@ -17,6 +17,22 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "./data/postgresql/data:/var/lib/postgresql/data"
       - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+  
+  db2:
+    image: ibmcom/db2:latest
+    container_name: glue_db2_docker
+    hostname: glue_db2_docker
+    user: root
+    privileged: true
+    environment:
+      - LICENSE=accept
+      - DB2INST1_PASSWORD=docker
+      - DBNAME=trash
+    ports:
+      - 50000:50000
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./data/db2/data:/database"
 
   activemq:
     image: apache/activemq-artemis:latest
@@ -152,11 +168,15 @@ services:
       - DATABASE_URL=jdbc:postgresql://glue_pg_docker:5432/trash
       - DATABASE_USER=docker
       - DATABASE_PASSWORD=docker
+      - DATABASE_URL_DB2=jdbc:db2://glue_db2_docker:50000/trash
+      - DATABASE_USER_DB2=DB2INST1
+      - DATABASE_PASSWORD_DB2=docker
       - JMS_HOST=tcp://activemq:61616
       - JMS_USER=artemis
       - JMS_PASSWORD=artemis
     depends_on:
       - postgres
+      - db2
       - activemq
       - zookeeper
       - schema-registry

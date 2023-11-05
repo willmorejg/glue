@@ -69,6 +69,7 @@ dependencies {
 	implementation 'org.apache.camel.springboot:camel-kafka-starter'
 	implementation 'org.apache.camel.springboot:camel-jms-starter'
 	implementation 'org.apache.camel.springboot:camel-activemq-starter'
+	implementation 'org.apache.camel.springboot:camel-jsonpath-starter'
 
 	implementation 'org.apache.camel:camel-support'
 
@@ -83,6 +84,8 @@ dependencies {
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 	runtimeOnly 'org.postgresql:postgresql:42.6.0'
+	runtimeOnly 'com.ibm.db2.jcc:db2jcc:db2jcc'
+	runtimeOnly 'com.ibm.db2.jcc:db2jcc:db2jcc4'
 
 	compileOnly 'org.projectlombok:lombok'
 
