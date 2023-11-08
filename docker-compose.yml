@@ -87,6 +87,8 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_LOG_RETENTION_MS=30000
+      - KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS=15000
       - TZ=America/New_York
   
   schema-registry:    
@@ -101,7 +103,7 @@ services:
       - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://glue_broker:50002
       - SCHEMA_REGISTRY_HOST_NAME=glue_schema_registry
       # - SCHEMA_REGISTRY_HOST_PORT=8981
-      # - SCHEMA_REGISTRY_LISTENERS=http://glue_schema_registry:8981
+      # - SCHEMA_REGISTRY_LISTENERS=http://glue_schema_registry:8081
       - SCHEMA_REGISTRY_DEBUG=true
     ports:
         - 8981:8081
@@ -132,9 +134,9 @@ services:
     environment:
       - BOOTSTRAP_SERVERS=glue_broker:50002
       - GROUP_ID=glue_debezium
-      - CONFIG_STORAGE_TOPIC=my_connect_configs
-      - OFFSET_STORAGE_TOPIC=my_connect_offsets
-      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      - CONFIG_STORAGE_TOPIC=glue_debezium_configs
+      - OFFSET_STORAGE_TOPIC=glue_debezium_offsets
+      - STATUS_STORAGE_TOPIC=glue_debezium_statuses
       - CONFIG_STORAGE_REPLICATION_FACTOR=1
       - OFFSET_STORAGE_REPLICATION_FACTOR=1
       - STATUS_STORAGE_REPLICATION_FACTOR=1

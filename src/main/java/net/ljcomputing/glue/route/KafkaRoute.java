@@ -39,7 +39,7 @@ public class KafkaRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from("kafka:debezium-trash.public.trash?brokers=glue_broker:50002&pollTimeoutMs=60000")
+        from("kafka:glue_debezium.public.trash?brokers=glue_broker:50002&pollTimeoutMs=60000")
                 .log(LoggingLevel.DEBUG, loggerClassname, "Message received from Kafka : \n${body}")
                 .log(LoggingLevel.DEBUG, loggerClassname, "   ==>>\n headers ${headers} \n<<==")
                 .process(debeziumProcessor);
